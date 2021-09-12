@@ -1,0 +1,30 @@
+name: Run
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+
+jobs:
+  build:
+
+    if: github.actor == github.repository_owner
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@main
+    - name: Down And Replace
+      run: |
+        wget https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/script/smzdm/smzdm_signin.js
+        wget https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/script/smzdm/smzdm_mission.js
+        npm i replace-in-file
+        node replace.js
+    - name: Run
+      run: |
+        npm i request cheerio
+        node smzdm_signin.js
+        node commit.js
+        node smzdm_mission.js
+      env:
+        COOKIE: ${{ secrets.COOKIE }}
+        COMMIT: ${{ secrets.COMMIT }}
+        PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
